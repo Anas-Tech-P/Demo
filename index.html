@@ -279,7 +279,8 @@
             frame.onload = finish;
             setTimeout(finish, 20000); // নেটওয়ার্ক খুব ধীর হলেও লোডার আটকে থাকবে না
 
-            frame.src = GOOGLE_SCRIPT_API + "?inst=" + encodeURIComponent(INSTITUTION_ID) + "&loadApp=true";
+            frame.src = GOOGLE_SCRIPT_API + "?inst=" + encodeURIComponent(INSTITUTION_ID) + "&loadApp=true" +
+                "&session=" + encodeURIComponent(getSavedSession() || '');
             document.getElementById('mainAppContainer').style.display = 'block';
         }
 
@@ -290,6 +291,16 @@
             frame.src = 'about:blank';
             document.getElementById('mainAppContainer').style.display = 'none';
         }
+
+        // অ্যাপের ভেতর থেকে "সেশন অবৈধ" খবর এলে লগইন ফর্মে ফেরা
+        window.addEventListener('message', function (ev) {
+            if (!/(googleusercontent\.com|script\.google\.com)$/.test(ev.origin || '')) return;
+            if (ev.data && ev.data.sms === 'session-invalid') {
+                clearSavedSession();
+                closeApp();
+                showLoginForm();
+            }
+        });
 
         function togglePasswordVisibility() {
             var pwField = document.getElementById('licenseKey');
