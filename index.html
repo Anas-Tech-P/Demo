@@ -4,8 +4,11 @@
     <meta charset="UTF-8" />  
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>প্রতিষ্ঠান ম্যানেজমেন্ট সিস্টেম</title> 
-   
-    <link href="https://fonts.googleapis.com/css2?family=SolaimanLipi&display=swap" rel="stylesheet" />
+
+    <!-- সার্ভারের সাথে সংযোগ আগে থেকেই খুলে রাখে (প্রতিটা অনুরোধ কিছুটা দ্রুত হয়) -->
+    <link rel="preconnect" href="https://script.google.com" crossorigin />
+    <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin />
+    <link rel="dns-prefetch" href="https://script.google.com" />
     
     <style>    
         * { 
@@ -191,7 +194,7 @@
 
     <div id="bootLoader">
         <div class="spinner"></div>
-        <span>সেশন যাচাই করা হচ্ছে…</span>
+        <span>লোড হচ্ছে…</span>
     </div>
 
     <div class="login-overlay" id="loginOverlay">
@@ -254,16 +257,38 @@
             var loader = document.getElementById('bootLoader');
             if (loader) loader.style.display = 'none';
         }
+        function showBootLoader(text) {
+            var loader = document.getElementById('bootLoader');
+            if (!loader) return;
+            if (text) loader.querySelector('span').textContent = text;
+            loader.style.display = 'flex';
+        }
         function showLoginForm() {
             hideBootLoader();
             document.getElementById('loginOverlay').classList.add('show');
         }
+
+        // অ্যাপ লোড শুরু করে। অ্যাপের পেজ নিজে লোড হওয়া পর্যন্তই লোডার দেখায়
         function openApp() {
-            hideBootLoader();
             document.getElementById('loginOverlay').classList.remove('show');
-            document.getElementById('appIframe').src =
-                GOOGLE_SCRIPT_API + "?inst=" + encodeURIComponent(INSTITUTION_ID) + "&loadApp=true";
+            var frame = document.getElementById('appIframe');
+            showBootLoader('লোড হচ্ছে…');
+
+            var done = false;
+            function finish() { if (done) return; done = true; hideBootLoader(); }
+            frame.onload = finish;
+            setTimeout(finish, 20000); // নেটওয়ার্ক খুব ধীর হলেও লোডার আটকে থাকবে না
+
+            frame.src = GOOGLE_SCRIPT_API + "?inst=" + encodeURIComponent(INSTITUTION_ID) + "&loadApp=true";
             document.getElementById('mainAppContainer').style.display = 'block';
+        }
+
+        // সেশন অবৈধ হলে অ্যাপ বন্ধ করে লগইনে ফেরায়
+        function closeApp() {
+            var frame = document.getElementById('appIframe');
+            frame.onload = null;
+            frame.src = 'about:blank';
+            document.getElementById('mainAppContainer').style.display = 'none';
         }
 
         function togglePasswordVisibility() {
@@ -303,19 +328,24 @@
                 return;
             }
 
+            // ⚡ আশাবাদী খোলা: আগের টোকেন থাকলে অ্যাপ সাথে সাথে লোড শুরু হয়,
+            // আর সেশন যাচাই পাশাপাশি (parallel) চলে — আগে একটার পর একটা চলত।
+            openApp();
+
             fetch(GOOGLE_SCRIPT_API + "?inst=" + encodeURIComponent(INSTITUTION_ID) + "&session=" + encodeURIComponent(savedToken))
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     if (data && data.success) {
                         if (data.session) saveSession(data.session);
-                        openApp();
                     } else {
+                        // সেশন শেষ — অ্যাপ বন্ধ করে লগইনে পাঠাও
                         clearSavedSession();
+                        closeApp();
                         showLoginForm();
                     }
                 })
                 .catch(function() {
-                    showLoginForm();
+                    // সাময়িক নেটওয়ার্ক সমস্যা: ব্যবহারকারীকে বের করে দেওয়া হয় না, অ্যাপ খোলা থাকে
                 });
         });
 
