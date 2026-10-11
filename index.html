@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>প্রতিষ্ঠানের ম্যানেজমেন্ট সিস্টেম</title>
+    <title>মাল্টি-প্রতিষ্ঠানের ম্যানেজমেন্ট সিস্টেম</title>
 
     <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1yCZGvb0PO7TouAbfFUDmzdvn6vhQY4qS=w1000" />
     <link rel="preconnect" href="https://script.google.com" crossorigin />
@@ -16,15 +16,15 @@
 
         .login-overlay { position: fixed; inset: 0; display: none; justify-content: center; align-items: center; z-index: 99999; padding: 20px; background: #f8fafc; }
         .login-overlay.show { display: flex; }
-        .login-card { background: #fff; padding: 35px 25px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,.1); width: 100%; max-width: 420px; text-align: center; border: 1px solid #e2e8f0; }
+        .login-card { background: #fff; padding: 30px 20px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,.1); width: 100%; max-width: 420px; text-align: center; border: 1px solid #e2e8f0; }
         .madrasa-logo { width: 80px; height: 80px; margin: 0 auto 12px auto; object-fit: contain; display: block; }
         .login-card h2 { margin: 0 0 6px; font-size: 22px; font-weight: 700; color: #0f172a; }
-        .login-card p { margin: 0 0 20px; color: #64748b; font-size: 13px; line-height: 1.5; }
+        .login-card p { margin: 0 0 18px; color: #64748b; font-size: 13px; line-height: 1.5; }
 
-        .error-msg { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; display: none; text-align: center; }
+        .error-msg { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 14px; display: none; text-align: center; }
 
-        .input-group { margin-bottom: 14px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 5px; font-size: 13px; color: #334155; font-weight: 600; }
+        .input-group { margin-bottom: 12px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 4px; font-size: 13px; color: #334155; font-weight: 600; }
         .input-group input { width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; color: #0f172a; font-size: 14px; outline: none; transition: all .2s ease; }
         .input-group input:focus { border-color: #0284c7; background: #fff; box-shadow: 0 0 0 3px rgba(2,132,199,.15); }
 
@@ -32,9 +32,13 @@
         .password-wrapper input { padding-right: 42px; }
         .toggle-pass-btn { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 16px; color: #64748b; }
 
-        .login-btn { width: 100%; padding: 12px; background: #0284c7; border: none; border-radius: 10px; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; transition: background .2s ease; margin-top: 8px; }
+        .login-btn { width: 100%; padding: 12px; background: #0284c7; border: none; border-radius: 10px; color: #fff; font-size: 15px; font-weight: bold; cursor: pointer; transition: background .2s ease; margin-top: 6px; }
         .login-btn:hover { background: #0369a1; }
         .login-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        /* সুইচ ইনস্টিটিউশন বা লগআউট বাটন (অ্যাপের ভেতরে ভাসমান বা মেনুতে রাখার জন্য) */
+        .switch-inst-btn { position: fixed; top: 10px; right: 10px; z-index: 9999; background: rgba(15, 23, 42, 0.7); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; backdrop-filter: blur(4px); }
+        .switch-inst-btn:hover { background: #ef4444; border-color: #ef4444; }
 
         #bootLoader { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; z-index: 100000; background: #fff; }
         #bootLoader .spinner { width: 36px; height: 36px; border: 3px solid #e2e8f0; border-top-color: #0284c7; border-radius: 50%; animation: spin .8s linear infinite; }
@@ -52,6 +56,9 @@
         <span>লোড হচ্ছে…</span>
     </div>
 
+    <!-- প্রতিষ্ঠান পরিবর্তনের বাটন (অ্যাপের ভেতরে থাকাকালীন উপরে ডানপাশে দেখাবে) -->
+    <button class="switch-inst-btn" id="switchBtn" style="display:none;" onclick="logoutAndSwitch()">🔄 প্রতিষ্ঠান পরিবর্তন</button>
+
     <div class="login-overlay" id="loginOverlay">
         <div class="login-card" id="loginCardContainer">
             <img src="https://lh3.googleusercontent.com/d/1yCZGvb0PO7TouAbfFUDmzdvn6vhQY4qS=w1000" alt="লোগো" class="madrasa-logo" />
@@ -60,19 +67,16 @@
 
             <div class="error-msg" id="errorBlock"></div>
 
-            <!-- ১. প্রতিষ্ঠান আইডি ইনপুট -->
             <div class="input-group">
                 <label for="instId">প্রতিষ্ঠানের কোড (Institution ID)</label>
                 <input type="text" id="instId" placeholder="যেমন: ATMS0478" autocomplete="off" required />
             </div>
 
-            <!-- ২. ইউজারনেম ইনপুট -->
             <div class="input-group">
                 <label for="username">ইউজারনেম / ফোন নম্বর</label>
                 <input type="text" id="username" placeholder="যেমন: AnasTech" autocomplete="username" required />
             </div>
 
-            <!-- ৩. পাসওয়ার্ড ইনপুট -->
             <div class="input-group">
                 <label for="licenseKey">পাসওয়ার্ড</label>
                 <div class="password-wrapper">
@@ -90,7 +94,6 @@
     </div>
 
     <script>
-        // Central Web App Exec Link
         var GOOGLE_SCRIPT_API = "https://script.google.com/macros/s/AKfycby6_WvDV9RWiBv8vg0GAdq5txYg2abB9KxylpTHv40XsPLvbDeoi1kw0xTCG0o-8dir9w/exec";
 
         function getSavedSession() { try { return localStorage.getItem('sms_session_token'); } catch (e) { return null; } }
@@ -110,13 +113,18 @@
 
         function hideBootLoader() { var l = document.getElementById('bootLoader'); if (l) l.style.display = 'none'; }
         function showBootLoader(text) { var l = document.getElementById('bootLoader'); if (l) { l.querySelector('span').textContent = text || 'লোড হচ্ছে…'; l.style.display = 'flex'; } }
-        function showLoginForm() { hideBootLoader(); document.getElementById('loginOverlay').classList.add('show'); }
+        function showLoginForm() { 
+            hideBootLoader(); 
+            document.getElementById('switchBtn').style.display = 'none';
+            document.getElementById('loginOverlay').classList.add('show'); 
+        }
         function showMsg(text) { var e = document.getElementById('errorBlock'); e.innerText = text; e.style.display = 'block'; }
 
         var appLoadFinish = null;
 
         function openApp(instId) {
             document.getElementById('loginOverlay').classList.remove('show');
+            document.getElementById('switchBtn').style.display = 'block'; // সুইচ বাটন অন করা হলো
             var frame = document.getElementById('appIframe');
             showBootLoader('লোড হচ্ছে…');
 
@@ -135,11 +143,11 @@
             document.getElementById('mainAppContainer').style.display = 'block';
         }
 
-        function closeApp() {
-            var frame = document.getElementById('appIframe');
-            frame.onload = null;
-            frame.removeAttribute('src');
+        function logoutAndSwitch() {
+            clearSavedSession(); // মেমোরি ক্লিয়ার
             document.getElementById('mainAppContainer').style.display = 'none';
+            document.getElementById('appIframe').removeAttribute('src');
+            showLoginForm(); // আবার লগইন ফর্মে নিয়ে যাওয়া
         }
 
         function togglePasswordVisibility() {
