@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>প্রতিষ্ঠানের ম্যানেজমেন্ট সিস্টেম</title>
+    <title>প্রতিষ্ঠানের ম্যানেজমেন্ট সিস্টেম - Anas Tech</title>
 
+    <!-- Anas Tech কোম্পানির লোগো ফেভিকন হিসেবে -->
     <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1yCZGvb0PO7TouAbfFUDmzdvn6vhQY4qS=w1000" />
     <link rel="preconnect" href="https://script.google.com" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,7 +18,10 @@
         .login-overlay { position: fixed; inset: 0; display: none; justify-content: center; align-items: center; z-index: 99999; padding: 20px; background: #f8fafc; }
         .login-overlay.show { display: flex; }
         .login-card { background: #fff; padding: 30px 20px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,.1); width: 100%; max-width: 420px; text-align: center; border: 1px solid #e2e8f0; }
-        .madrasa-logo { width: 80px; height: 80px; margin: 0 auto 12px auto; object-fit: contain; display: block; }
+        
+        /* Anas Tech লোগো ডিজাইন স্টাইল */
+        .company-logo { width: 90px; height: 90px; margin: 0 auto 12px auto; object-fit: contain; display: block; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
         .login-card h2 { margin: 0 0 6px; font-size: 22px; font-weight: 700; color: #0f172a; }
         .login-card p { margin: 0 0 18px; color: #64748b; font-size: 13px; line-height: 1.5; }
 
@@ -36,7 +40,6 @@
         .login-btn:hover { background: #0369a1; }
         .login-btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
-        /* সুইচ ইনস্টিটিউশন বা লগআউট বাটন (অ্যাপের ভেতরে ভাসমান বা মেনুতে রাখার জন্য) */
         .switch-inst-btn { position: fixed; top: 10px; right: 10px; z-index: 9999; background: rgba(15, 23, 42, 0.7); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; backdrop-filter: blur(4px); }
         .switch-inst-btn:hover { background: #ef4444; border-color: #ef4444; }
 
@@ -56,13 +59,13 @@
         <span>লোড হচ্ছে…</span>
     </div>
 
-    <!-- প্রতিষ্ঠান পরিবর্তনের বাটন (অ্যাপের ভেতরে থাকাকালীন উপরে ডানপাশে দেখাবে) -->
     <button class="switch-inst-btn" id="switchBtn" style="display:none;" onclick="logoutAndSwitch()">🔄Log Out</button>
 
     <div class="login-overlay" id="loginOverlay">
         <div class="login-card" id="loginCardContainer">
-            <img src="https://lh3.googleusercontent.com/d/1yCZGvb0PO7TouAbfFUDmzdvn6vhQY4qS=w1000" alt="লোগো" class="madrasa-logo" />
-            <h2>লাইসেন্স ও প্রতিষ্ঠান লগইন</h2>
+            <!-- Anas Tech কোম্পানির লোগো -->
+            <img src="https://lh3.googleusercontent.com/d/1yCZGvb0PO7TouAbfFUDmzdvn6vhQY4qS=w1000" alt="Anas Tech Logo" class="company-logo" />
+            <h2>Anas Tech সফটওয়্যার পোর্টাল</h2>
             <p>আপনার প্রতিষ্ঠানের আইডি, ইউজারনেম ও পাসওয়ার্ড দিন</p>
 
             <div class="error-msg" id="errorBlock"></div>
@@ -124,7 +127,7 @@
 
         function openApp(instId) {
             document.getElementById('loginOverlay').classList.remove('show');
-            document.getElementById('switchBtn').style.display = 'block'; // সুইচ বাটন অন করা হলো
+            document.getElementById('switchBtn').style.display = 'block'; 
             var frame = document.getElementById('appIframe');
             showBootLoader('লোড হচ্ছে…');
 
@@ -144,10 +147,10 @@
         }
 
         function logoutAndSwitch() {
-            clearSavedSession(); // মেমোরি ক্লিয়ার
+            clearSavedSession(); 
             document.getElementById('mainAppContainer').style.display = 'none';
             document.getElementById('appIframe').removeAttribute('src');
-            showLoginForm(); // আবার লগইন ফর্মে নিয়ে যাওয়া
+            showLoginForm(); 
         }
 
         function togglePasswordVisibility() {
